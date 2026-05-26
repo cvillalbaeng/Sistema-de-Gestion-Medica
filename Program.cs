@@ -242,38 +242,147 @@ namespace SistemaGestionMedica
             }
         }
     }
-
     // =================================================================
-    // INTEGRANTE 1 e INTEGRANTE 2 (Clases Base)
+    // INTEGRANTE 1: CLASES PACIENTE Y MÉDICO (Constructores y Métodos)
     // =================================================================
     public class Paciente
     {
-        // INTEGRANTE 1: Desarrollar aquí propiedades completas, constructores y métodos de Paciente
-        public string Cedula { get; set; } = string.Empty;
-        public string NombreCompleto { get; set; } = string.Empty;
+        public string Cedula { get; set; }
+        public string NombreCompleto { get; set; }
         public int Edad { get; set; }
-        public string Telefono { get; set; } = string.Empty;
-        public List<Cita> HistorialCitas { get; set; } = new List<Cita>();
+        public string Telefono { get; set; }
+        public List<Cita> HistorialCitas { get; set; }
+
+        // Constructor sin parámetros
+        public Paciente()
+        {
+            Cedula = string.Empty;
+            NombreCompleto = string.Empty;
+            Telefono = string.Empty;
+            HistorialCitas = new List<Cita>();
+        }
+
+        // Constructor parametrizado (El que necesita el Integrante 3)
+        public Paciente(string cedula, string nombre, int edad, string telefono)
+        {
+            Cedula = cedula;
+            NombreCompleto = nombre;
+            Edad = edad;
+            Telefono = telefono;
+            HistorialCitas = new List<Cita>();
+        }
+
+        public void MostrarInformacion()
+        {
+            Console.WriteLine($"🔹 Paciente: {NombreCompleto} | C.I: {Cedula} | Edad: {Edad} | Tel: {Telefono}");
+        }
     }
 
     public class Medico
     {
-        // INTEGRANTE 1: Desarrollar aquí propiedades completas, constructores y métodos de Médico
-        public string CodigoMedico { get; set; } = string.Empty;
-        public string NombreCompleto { get; set; } = string.Empty;
-        public string Specialidad { get; set; } = string.Empty;
+        public string CodigoMedico { get; set; }
+        public string NombreCompleto { get; set; }
+        public string Especialidad { get; set; } // <--- Cambiado a Español
         public bool Disponible { get; set; }
-        public List<Paciente> PacientesAtendidos { get; set; } = new List<Paciente>();
+        public List<Paciente> PacientesAtendidos { get; set; }
+
+        public Medico()
+        {
+            CodigoMedico = string.Empty;
+            NombreCompleto = string.Empty;
+            Especialidad = string.Empty;
+            PacientesAtendidos = new List<Paciente>();
+        }
+
+        // Constructor parametrizado (El que necesita el Integrante 3)
+        public Medico(string codigo, string nombre, string especialidad)
+        {
+            CodigoMedico = codigo;
+            NombreCompleto = nombre;
+            Especialidad = especialidad; // <--- Asignación corregida en español
+            Disponible = true;
+            PacientesAtendidos = new List<Paciente>();
+        }
+
+        public void MostrarInformacion()
+        {
+            string estado = Disponible ? "✅ Disponible" : "❌ Ocupado";
+            Console.WriteLine($"🥼 Dr(a). {NombreCompleto} | Código: {CodigoMedico} | Esp: {Especialidad} | {estado}");
+        }
     }
 
+    // =================================================================
+    // INTEGRANTE 2: CLASE CITA (Rescatada, encapsulada y corregida)
+    // =================================================================
     public class Cita
     {
-        // INTEGRANTE 2: Desarrollar aquí constructores y lógicas de fecha para la Cita
-        public string Codigo { get; set; } = string.Empty;
-        public Paciente Paciente { get; set; } = new Paciente();
-        public Medico Medico { get; set; } = new Medico();
-        public DateTime FechaCita { get; set; }
-        public string MotivoConsulta { get; set; } = string.Empty;
-        public bool Atendida { get; set; }
+        // CA-20: Campos privados utilizando la nomenclatura con guion bajo
+        private string _codigo = string.Empty;
+        private Paciente _paciente = new Paciente();
+        private Medico _medico = new Medico();
+        private DateTime _fechaCita;
+        private string _motivoConsulta = string.Empty;
+        private bool _atendida;
+
+        public string Codigo
+        {
+            get => _codigo;
+            set => _codigo = value;
+        }
+        public Paciente Paciente
+        {
+            get => _paciente;
+            set => _paciente = value;
+        }
+        public Medico Medico
+        {
+            get => _medico;
+            set => _medico = value;
+        }
+        public DateTime FechaCita
+        {
+            get => _fechaCita;
+            set => _fechaCita = value;
+        }
+        public string MotivoConsulta
+        {
+            get => _motivoConsulta;
+            set => _motivoConsulta = value;
+        }
+        public bool Atendida
+        {
+            get => _atendida;
+            set => _atendida = value;
+        }
+
+        // Constructor sin parámetros por defecto
+        public Cita()
+        {
+            _fechaCita = DateTime.Now;
+            _atendida = false;
+        }
+
+        // Constructor parametrizado
+        public Cita(Paciente paciente, Medico medico, DateTime fechaCita, string motivoConsulta)
+        {
+            _paciente = paciente;
+            _medico = medico;
+            _fechaCita = fechaCita;
+            _motivoConsulta = motivoConsulta;
+            _atendida = false;
+        }
+
+        // Método propio de comportamiento
+        public void MostrarInformacion()
+        {
+            Console.WriteLine("---------------------------------------------------------");
+            Console.WriteLine($"🔹 Cita Código: {Codigo} | Estado: {(Atendida ? "✅ Atendida" : "⏳ Pendiente")}");
+            Console.WriteLine($"📅 Fecha: {FechaCita:dd/MM/yyyy HH:mm}");
+            Console.WriteLine($"👤 Paciente: {Paciente.NombreCompleto} (Cédula: {Paciente.Cedula})");
+            // LÍNEA CORREGIDA: Ahora accede a Medico.Especialidad sin errores ⬇️
+            Console.WriteLine($"🥼 Médico: {Medico.NombreCompleto} (Especialidad: {Medico.Especialidad})");
+            Console.WriteLine($"📝 Motivo de Consulta: {(string.IsNullOrEmpty(MotivoConsulta) ? "No especificado" : MotivoConsulta)}");
+            Console.WriteLine("---------------------------------------------------------");
+        }
     }
 }
