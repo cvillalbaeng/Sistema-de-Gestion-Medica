@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace SistemaGestionMedica
 {
     // =================================================================
-    // EL MENÚ PRINCIPAL DEL SISTEMA ---> PARTE DEL INTEGRANTE 4 (TÚ)
+    // EL MENÚ PRINCIPAL DEL SISTEMA ---> PARTE DEL INTEGRANTE 4
     // =================================================================
     internal class Program
     {
@@ -111,8 +111,8 @@ namespace SistemaGestionMedica
             Citas = new List<Cita>();
 
             // Datos de prueba precargados para facilitar la evaluación del profesor
-            Paciente p1 = new Paciente("123", "Jose Lopez", 38, "0412-1112233");
-            Paciente p2 = new Paciente("456", "Pedro Perez", 25, "0414-4445566");
+            Paciente p1 = new Paciente("12345678", "Jose Lopez", 38, "04121112233");
+            Paciente p2 = new Paciente("23456789", "Pedro Perez", 25, "04144445566");
             Pacientes.Add(p1);
             Pacientes.Add(p2);
 
@@ -138,12 +138,13 @@ namespace SistemaGestionMedica
             Console.WriteLine("          👤 REGISTRAR PACIENTE        ");
             Console.WriteLine("=======================================");
 
-            Console.Write("🔹 Ingrese la Cédula: ");
+            Console.Write("🔹 Ingrese la Cédula (Solo números): ");
             string cedulaInput = Console.ReadLine() ?? string.Empty;
 
-            if (string.IsNullOrWhiteSpace(cedulaInput))
+            // VALIDACIÓN: Que no esté vacío, que sea numérico y cumpla el formato venezolano (entre 6 y 9 dígitos)
+            if (string.IsNullOrWhiteSpace(cedulaInput) || !long.TryParse(cedulaInput, out _) || cedulaInput.Length < 6 || cedulaInput.Length > 9)
             {
-                Console.WriteLine("🛑 Error: La cédula es un campo obligatorio.");
+                Console.WriteLine("🛑 Error: La cédula debe contener solo números y tener entre 6 y 9 dígitos (Formato Venezolano).");
                 return;
             }
 
@@ -156,12 +157,28 @@ namespace SistemaGestionMedica
                 }
             }
 
-            Console.Write("🔹 Ingrese el Nombre Completo: ");
+            Console.Write("🔹 Ingrese el Nombre Completo (Solo letras): ");
             string nombreInput = Console.ReadLine() ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(nombreInput))
             {
                 Console.WriteLine("🛑 Error: El nombre completo no puede estar vacío.");
+                return;
+            }
+
+            // VALIDACIÓN: Comprobar que solo contenga letras y espacios
+            bool nombreValido = true;
+            foreach (char c in nombreInput)
+            {
+                if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
+                {
+                    nombreValido = false;
+                    break;
+                }
+            }
+            if (!nombreValido)
+            {
+                Console.WriteLine("🛑 Error: El nombre completo solo debe contener letras y espacios (No se permiten números ni símbolos).");
                 return;
             }
 
@@ -176,12 +193,13 @@ namespace SistemaGestionMedica
                 return;
             }
 
-            Console.Write("🔹 Ingrese el Número de Teléfono: ");
+            Console.Write("🔹 Ingrese el Número de Teléfono (Solo números): ");
             string telefonoInput = Console.ReadLine() ?? string.Empty;
 
-            if (string.IsNullOrWhiteSpace(telefonoInput))
+            // VALIDACIÓN: Que no esté vacío, que sea numérico y tenga longitud de teléfono celular válido (10 a 11 dígitos)
+            if (string.IsNullOrWhiteSpace(telefonoInput) || !long.TryParse(telefonoInput, out _) || telefonoInput.Length < 10 || telefonoInput.Length > 11)
             {
-                Console.WriteLine("🛑 Error: El teléfono de contacto es obligatorio.");
+                Console.WriteLine("🛑 Error: El teléfono de contacto debe contener solo números (Formato de 10 a 11 dígitos).");
                 return;
             }
 
@@ -215,12 +233,28 @@ namespace SistemaGestionMedica
                 }
             }
 
-            Console.Write("🔹 Ingrese el Nombre Completo del Médico: ");
+            Console.Write("🔹 Ingrese el Nombre Completo del Médico (Solo letras): ");
             string nombreInput = Console.ReadLine() ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(nombreInput))
             {
                 Console.WriteLine("🛑 Error: El nombre del médico es requerido.");
+                return;
+            }
+
+            // VALIDACIÓN: Comprobar que el nombre del médico solo contenga letras y espacios
+            bool nombreMedicoValido = true;
+            foreach (char c in nombreInput)
+            {
+                if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
+                {
+                    nombreMedicoValido = false;
+                    break;
+                }
+            }
+            if (!nombreMedicoValido)
+            {
+                Console.WriteLine("🛑 Error: El nombre del médico solo debe contener letras y espacios.");
                 return;
             }
 
@@ -480,7 +514,7 @@ namespace SistemaGestionMedica
         public void MenuBusquedas()
         {
             Console.WriteLine("\n=======================================");
-            Console.WriteLine("       🔍 CONSULTAS Y BÚSQUEDAS        ");
+            Console.WriteLine("        🔍 CONSULTAS Y BÚSQUEDAS        ");
             Console.WriteLine("=======================================");
             Console.WriteLine(" 1. Buscar Paciente (Por Nombre/Cédula) [EXTRA-1]");
             Console.WriteLine(" 2. Buscar Médico por Especialidad      [EXTRA-2]");
@@ -567,68 +601,135 @@ namespace SistemaGestionMedica
     }
 
     // =================================================================
-    // INTEGRANTE 1: CLASES PACIENTE Y MÉDICO (Propiedades Automáticas Básicas)
+    // INTEGRANTE 1: CLASES PACIENTE Y MÉDICO (DESARROLLADO CON CA-20 Y CA-21)
     // =================================================================
     public class Paciente
     {
-        public string Cedula { get; set; }
-        public string NombreCompleto { get; set; }
-        public int Edad { get; set; }
-        public string Telefono { get; set; }
-        public List<Cita> HistorialCitas { get; set; }
+        // CA-20: Campos privados utilizando la nomenclatura formal con guion bajo
+        private string _cedula = string.Empty;
+        private string _nombreCompleto = string.Empty;
+        private int _edad;
+        private string _telefono = string.Empty;
+        private List<Cita> _historialCitas = new List<Cita>();
 
-        public Paciente()
+        // CA-21: Propiedades públicas acopladas mediante métodos accesores Getters y Setters
+        public string Cedula
         {
-            Cedula = string.Empty;
-            NombreCompleto = string.Empty;
-            Telefono = string.Empty;
-            HistorialCitas = new List<Cita>();
+            get => _cedula;
+            set => _cedula = value;
         }
 
+        public string NombreCompleto
+        {
+            get => _nombreCompleto;
+            set => _nombreCompleto = value;
+        }
+
+        public int Edad
+        {
+            get => _edad;
+            set
+            {
+                // Validación interna de consistencia lógica
+                if (value <= 0) _edad = 1;
+                else _edad = value;
+            }
+        }
+
+        public string Telefono
+        {
+            get => _telefono;
+            set => _telefono = value;
+        }
+
+        public List<Cita> HistorialCitas
+        {
+            get => _historialCitas;
+            set => _historialCitas = value;
+        }
+
+        // Constructor sin parámetros por defecto
+        public Paciente()
+        {
+            _historialCitas = new List<Cita>();
+        }
+
+        // Constructor parametrizado formal
         public Paciente(string cedula, string nombre, int edad, string telefono)
         {
-            Cedula = cedula;
-            NombreCompleto = nombre;
-            Edad = edad;
-            Telefono = telefono;
-            HistorialCitas = new List<Cita>();
+            _cedula = cedula;
+            _nombreCompleto = nombre;
+            Edad = edad; // Pasa automáticamente por el filtro del set
+            _telefono = telefono;
+            _historialCitas = new List<Cita>();
         }
 
         public void MostrarInformacion()
         {
-            Console.WriteLine($"🔹 Paciente: {NombreCompleto} | C.I: {Cedula} | Edad: {Edad} | Tel: {Telefono}");
+            Console.WriteLine($"🔹 Paciente: {_nombreCompleto} | C.I: {_cedula} | Edad: {_edad} | Tel: {_telefono}");
         }
     }
 
     public class Medico
     {
-        public string CodigoMedico { get; set; }
-        public string NombreCompleto { get; set; }
-        public string Especialidad { get; set; }
-        public bool Disponible { get; set; }
-        public List<Paciente> PacientesAtendidos { get; set; }
+        // CA-20: Campos privados utilizando la nomenclatura formal con guion bajo
+        private string _codigoMedico = string.Empty;
+        private string _nombreCompleto = string.Empty;
+        private string _especialidad = string.Empty;
+        private bool _disponible;
+        private List<Paciente> _pacientesAtendidos = new List<Paciente>();
 
-        public Medico()
+        // CA-21: Propiedades públicas acopladas mediante métodos accesores Getters y Setters
+        public string CodigoMedico
         {
-            CodigoMedico = string.Empty;
-            NombreCompleto = string.Empty;
-            Especialidad = string.Empty;
-            PacientesAtendidos = new List<Paciente>();
+            get => _codigoMedico;
+            set => _codigoMedico = value;
         }
 
+        public string NombreCompleto
+        {
+            get => _nombreCompleto;
+            set => _nombreCompleto = value;
+        }
+
+        public string Especialidad
+        {
+            get => _especialidad;
+            set => _especialidad = value;
+        }
+
+        public bool Disponible
+        {
+            get => _disponible;
+            set => _disponible = value;
+        }
+
+        public List<Paciente> PacientesAtendidos
+        {
+            get => _pacientesAtendidos;
+            set => _pacientesAtendidos = value;
+        }
+
+        // Constructor sin parámetros por defecto
+        public Medico()
+        {
+            _pacientesAtendidos = new List<Paciente>();
+        }
+
+        // Constructor parametrizado formal
         public Medico(string codigo, string nombre, string especialidad)
         {
-            CodigoMedico = codigo;
-            NombreCompleto = nombre;
-            Especialidad = especialidad;
-            Disponible = true;
-            PacientesAtendidos = new List<Paciente>();
+            _codigoMedico = codigo;
+            _nombreCompleto = nombre;
+            _especialidad = especialidad;
+            _disponible = true;
+            _pacientesAtendidos = new List<Paciente>();
         }
 
         public void MostrarInformacion()
         {
-            string estado = Disponible ? "✅ Disponible" : "❌ Ocupado";
-            Console.WriteLine($"🥼 Dr(a). {NombreCompleto} | Código: {CodigoMedico} | Esp: {Especialidad} | {estado}");
+            string estado = _disponible ? "✅ Disponible" : "❌ Ocupado";
+            Console.WriteLine($"🥼 Dr(a). {_nombreCompleto} | Código: {_codigoMedico} | Esp: {_especialidad} | {estado}");
         }
     }
 
