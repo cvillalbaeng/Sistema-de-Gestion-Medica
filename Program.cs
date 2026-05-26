@@ -104,36 +104,187 @@ namespace SistemaGestionMedica
         }
 
         // =============================================================
-        // INTEGRANTE 3 (Registros y Listas)
+        // INTEGRANTE 3: MÉTODOS DE REGISTRO Y VISUALIZACIÓN (RESCATADO)
         // =============================================================
         public void RegistrarPaciente()
         {
-            // INTEGRANTE 3: Desarrolla aquí la captura de datos del paciente por consola
+            Console.WriteLine("\n=======================================");
+            Console.WriteLine("          👤 REGISTRAR PACIENTE        ");
+            Console.WriteLine("=======================================");
+
+            Console.Write("🔹 Ingrese la Cédula: ");
+            string cedulaInput = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(cedulaInput))
+            {
+                Console.WriteLine("🛑 Error: La cédula es un campo obligatorio.");
+                return;
+            }
+
+            foreach (var pacienteExistente in Pacientes)
+            {
+                if (pacienteExistente.Cedula.Trim() == cedulaInput.Trim())
+                {
+                    Console.WriteLine("🛑 Error: Ya existe un paciente registrado con esa misma cédula.");
+                    return;
+                }
+            }
+
+            Console.Write("🔹 Ingrese el Nombre Completo: ");
+            string nombreInput = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(nombreInput))
+            {
+                Console.WriteLine("🛑 Error: El nombre completo no puede estar vacío.");
+                return;
+            }
+
+            Console.Write("🔹 Ingrese la Edad: ");
+            string edadInput = Console.ReadLine() ?? string.Empty;
+            int edadConvertida;
+            bool esNumeroValido = int.TryParse(edadInput, out edadConvertida);
+
+            if (!esNumeroValido || edadConvertida <= 0)
+            {
+                Console.WriteLine("🛑 Error: Debe ingresar una edad numérica válida (mayor a cero).");
+                return;
+            }
+
+            Console.Write("🔹 Ingrese el Número de Teléfono: ");
+            string telefonoInput = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(telefonoInput))
+            {
+                Console.WriteLine("🛑 Error: El teléfono de contacto es obligatorio.");
+                return;
+            }
+
+            // Instanciamos usando el constructor parametrizado del Integrante 1
+            Paciente nuevoPaciente = new Paciente(cedulaInput, nombreInput, edadConvertida, telefonoInput);
+            Pacientes.Add(nuevoPaciente);
+
+            Console.WriteLine($"\n🎉 ¡Éxito! El paciente '{nombreInput}' ha sido registrado correctamente.");
         }
 
         public void RegistrarMedico()
         {
-            // INTEGRANTE 3: Desarrolla aquí la captura de datos del médico por consola
+            Console.WriteLine("\n=======================================");
+            Console.WriteLine("           🥼 REGISTRAR MÉDICO          ");
+            Console.WriteLine("=======================================");
+
+            Console.Write("🔹 Ingrese el Código Único del Médico: ");
+            string codigoInput = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(codigoInput))
+            {
+                Console.WriteLine("🛑 Error: El código del médico no puede estar en blanco.");
+                return;
+            }
+
+            foreach (var medicoExistente in Medicos)
+            {
+                if (medicoExistente.CodigoMedico.Trim() == codigoInput.Trim())
+                {
+                    Console.WriteLine("🛑 Error: Ese código ya le pertenece a otro médico en el sistema.");
+                    return;
+                }
+            }
+
+            Console.Write("🔹 Ingrese el Nombre Completo del Médico: ");
+            string nombreInput = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(nombreInput))
+            {
+                Console.WriteLine("🛑 Error: El nombre del médico es requerido.");
+                return;
+            }
+
+            Console.Write("🔹 Ingrese la Especialidad Médica: ");
+            string especialidadInput = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(especialidadInput))
+            {
+                Console.WriteLine("🛑 Error: Debe especificar una especialidad.");
+                return;
+            }
+
+            // Instanciamos usando el constructor parametrizado del Integrante 1
+            Medico nuevoMedico = new Medico(codigoInput, nombreInput, especialidadInput);
+            Medicos.Add(nuevoMedico);
+
+            Console.WriteLine($"\n🎉 ¡Éxito! El Dr(a). '{nombreInput}' se integró al sistema correctamente.");
         }
 
         public void MostrarPacientes()
         {
-            // INTEGRANTE 3: Desarrolla aquí el despliegue de la lista completa de pacientes
+            if (Pacientes.Count == 0)
+            {
+                Console.WriteLine("ℹ️ No hay pacientes registrados en el sistema actualmente.");
+                return;
+            }
+
+            Console.WriteLine("\n=========================================================");
+            Console.WriteLine("             👤 LISTA DE PACIENTES REGISTRADOS            ");
+            Console.WriteLine("=========================================================");
+
+            foreach (var paciente in Pacientes)
+            {
+                paciente.MostrarInformacion();
+                Console.WriteLine("---------------------------------------------------------");
+            }
         }
 
         public void MostrarTodosLosMedicos()
         {
-            // INTEGRANTE 3: Desarrolla aquí el catálogo completo de médicos
+            if (Medicos.Count == 0)
+            {
+                Console.WriteLine("ℹ️ No hay médicos registrados en el sistema actualmente.");
+                return;
+            }
+
+            Console.WriteLine("\n=========================================================");
+            Console.WriteLine("              🗂️ CATÁLOGO GENERAL DE MÉDICOS             ");
+            Console.WriteLine("=========================================================");
+
+            foreach (var medico in Medicos)
+            {
+                medico.MostrarInformacion();
+                Console.WriteLine("---------------------------------------------------------");
+            }
         }
 
         public void MostrarMedicosDisponibles()
         {
-            // INTEGRANTE 3: Desarrolla aquí el filtro de médicos disponibles == true
+            if (Medicos.Count == 0)
+            {
+                Console.WriteLine("ℹ️ No hay médicos registrados en el sistema.");
+                return;
+            }
+
+            Console.WriteLine("\n=========================================================");
+            Console.WriteLine("             ✅ PERSONAL MÉDICO DISPONIBLE               ");
+            Console.WriteLine("=========================================================");
+
+            int medicosDisponiblesContados = 0;
+
+            foreach (var medico in Medicos)
+            {
+                if (medico.Disponible == true)
+                {
+                    medico.MostrarInformacion();
+                    Console.WriteLine("---------------------------------------------------------");
+                    medicosDisponiblesContados++;
+                }
+            }
+
+            if (medicosDisponiblesContados == 0)
+            {
+                Console.WriteLine("ℹ️ Alerta: Todos los médicos se encuentran ocupados o no disponibles.");
+            }
         }
 
-
         // =============================================================
-        // LÓGICA DE CITAS Y NEGOCIO ---> Parte del INTEGRANTE 4 
+        // LÓGICA DE CITAS Y NEGOCIO ---> PARTE DEL INTEGRANTE 4 (TÚ)
         // =============================================================
         public void AgendarCita(string cedula, string codigoMedico)
         {
@@ -233,7 +384,7 @@ namespace SistemaGestionMedica
             }
 
             Console.WriteLine("\n=======================================");
-            Console.WriteLine("    📜  HISTORIAL GENERAL DE CITAS ");
+            Console.WriteLine("    📜  HISTORIAL GENERAL DE CITAS     ");
             Console.WriteLine("=======================================");
             foreach (var cita in Citas)
             {
