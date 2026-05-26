@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace SistemaGestionMedica
 {
     // =================================================================
-    // EL MENÚ PRINCIPAL DEL SISTEMA ---> PARTE DEL INTEGRANTE 4.
+    // EL MENÚ PRINCIPAL DEL SISTEMA ---> PARTE DEL INTEGRANTE 4 (TÚ)
     // =================================================================
     internal class Program
     {
@@ -13,10 +13,10 @@ namespace SistemaGestionMedica
             // Codificación universal para soportar emojis y caracteres especiales
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-            // 1. Instancia la clínica en memoria con las listas globales precargadas
+            // 1. Instancia la clínica en memoria con las listas globales precargadas (CA-10)
             Clinica miClinica = new Clinica();
 
-            // 2. Control del bucle del menú
+            // 2. Control del bucle del menú (CA-17)
             bool programInExecution = true;
 
             while (programInExecution)
@@ -32,10 +32,11 @@ namespace SistemaGestionMedica
                 Console.WriteLine(" 6. 📅 Agendar Cita");
                 Console.WriteLine(" 7. 🩺 Atender Cita (Con Diagnóstico)");
                 Console.WriteLine(" 8. ⏳ Mostrar Citas Pendientes");
-                Console.WriteLine(" 9. 📜 Mostrar Historial General");
+                Console.WriteLine(" 9. 📜 Mostrar Historial General de Citas");
                 Console.WriteLine("10. 📊 Mostrar Estadísticas del Sistema");
-                Console.WriteLine("11. ❌ Salir del Sistema");
-                Console.Write("\n🔹 Seleccione una opción (1-11): ");
+                Console.WriteLine("11. 🔍 Módulo de Búsquedas Avanzadas (EXTRAS)");
+                Console.WriteLine("12. ❌ Salir del Sistema");
+                Console.Write("\n🔹 Seleccione una opción (1-12): ");
 
                 string opcion = Console.ReadLine() ?? string.Empty;
                 switch (opcion)
@@ -81,11 +82,14 @@ namespace SistemaGestionMedica
                         miClinica.MostrarEstadisticas();
                         break;
                     case "11":
+                        miClinica.MenuBusquedas();
+                        break;
+                    case "12":
                         Console.WriteLine("\n👋 Saliendo del sistema... ¡Hasta luego!");
                         programInExecution = false;
                         break;
                     default:
-                        Console.WriteLine("⚠️ Opción inválida. Por favor, intente del 1 al 11.");
+                        Console.WriteLine("⚠️ Opción inválida. Por favor, intente del 1 al 12.");
                         break;
                 }
             }
@@ -107,14 +111,14 @@ namespace SistemaGestionMedica
             Citas = new List<Cita>();
 
             // Datos de prueba precargados para facilitar la evaluación del profesor
-            Paciente p1 = new Paciente("123", "Jose Alfonzo", 38, "0412-1112233");
+            Paciente p1 = new Paciente("123", "Jose Lopez", 38, "0412-1112233");
             Paciente p2 = new Paciente("456", "Pedro Perez", 25, "0414-4445566");
             Pacientes.Add(p1);
             Pacientes.Add(p2);
 
-            Medico m1 = new Medico("MED-01", "Dr. Luis Gomez", "Cardiología");
-            Medico m2 = new Medico("MED-02", "Dr. Juan Gonzalez", "Pediatría");
-            m2.Disponible = false; // Forzado para probar la validación de no disponibilidad
+            Medico m1 = new Medico("MED-01", "Dr. Pedro Ramirez", "Cardiología");
+            Medico m2 = new Medico("MED-02", "Dr. Luis Gomez", "Pediatría");
+            m2.Disponible = false;
             Medicos.Add(m1);
             Medicos.Add(m2);
 
@@ -304,7 +308,7 @@ namespace SistemaGestionMedica
         }
 
         // =============================================================
-        // LÓGICA DE CITAS Y NEGOCIO ---> INTEGRANTE 4
+        // LÓGICA DE CITAS Y NEGOCIO ---> INTEGRANTE 4 (TÚ)
         // =============================================================
         public void AgendarCita(string cedula, string codigoMedico)
         {
@@ -346,7 +350,7 @@ namespace SistemaGestionMedica
                 return;
             }
 
-            // EXTRA-3: Validar límite estricto de máximo 3 citas por médico al día
+            // EXTRA-3: Validar límite de máximo 3 citas por médico al día
             int citasDelMedicoHoy = 0;
             DateTime hoy = DateTime.Today;
             foreach (var cita in Citas)
@@ -371,7 +375,7 @@ namespace SistemaGestionMedica
             nuevaCita.Atendida = false;
 
             Citas.Add(nuevaCita);
-            pacienteEncontrado.HistorialCitas.Add(nuevaCita); // CA-5: Adición directa al historial del paciente
+            pacienteEncontrado.HistorialCitas.Add(nuevaCita);
 
             Console.WriteLine($"🎉 ¡Cita {nuevaCita.Codigo} agendada con éxito para el paciente {pacienteEncontrado.NombreCompleto} con el Dr. {medicoEncontrado.NombreCompleto}!");
         }
@@ -392,7 +396,7 @@ namespace SistemaGestionMedica
                         diagnosticoInput = "Consulta general completada sin observaciones críticas.";
                     }
 
-                    cita.MotivoConsulta = diagnosticoInput; // Almacenamos el diagnóstico como el motivo extendido resultante
+                    cita.MotivoConsulta = diagnosticoInput;
                     cita.Atendida = true;
                     cita.Medico.PacientesAtendidos.Add(cita.Paciente);
 
@@ -469,10 +473,101 @@ namespace SistemaGestionMedica
             Console.WriteLine($"   ⏳ Citas en Espera: {Citas.Count - atendidas}");
             Console.WriteLine("=======================================");
         }
+
+        // =============================================================
+        // 🌟 SUB-MENÚ EXTRAS: MÓDULO DE BÚSQUEDAS AVANZADAS
+        // =============================================================
+        public void MenuBusquedas()
+        {
+            Console.WriteLine("\n=======================================");
+            Console.WriteLine("       🔍 CONSULTAS Y BÚSQUEDAS        ");
+            Console.WriteLine("=======================================");
+            Console.WriteLine(" 1. Buscar Paciente (Por Nombre/Cédula) [EXTRA-1]");
+            Console.WriteLine(" 2. Buscar Médico por Especialidad      [EXTRA-2]");
+            Console.WriteLine(" 3. Ver Historial Médico de un Paciente [EXTRA-5]");
+            Console.WriteLine(" 4. Buscar Cita (Por Código/Paciente)   [EXTRA-7]");
+            Console.WriteLine(" 5. Volver al Menú Principal");
+            Console.Write("\n🔹 Seleccione una opción de búsqueda (1-5): ");
+
+            string subOpcion = Console.ReadLine() ?? string.Empty;
+            switch (subOpcion)
+            {
+                case "1":
+                    Console.Write("🔹 Ingrese el Nombre o Cédula a buscar: ");
+                    string criterioP = Console.ReadLine() ?? string.Empty;
+                    bool pEncontrado = false;
+                    foreach (var p in Pacientes)
+                    {
+                        if (p.Cedula.Contains(criterioP) || p.NombreCompleto.ToLower().Contains(criterioP.ToLower()))
+                        {
+                            p.MostrarInformacion();
+                            pEncontrado = true;
+                        }
+                    }
+                    if (!pEncontrado) Console.WriteLine("ℹ️ No se encontraron pacientes que coincidan con la búsqueda.");
+                    break;
+
+                case "2":
+                    Console.Write("🔹 Ingrese la Especialidad a buscar: ");
+                    string criterioE = Console.ReadLine() ?? string.Empty;
+                    bool mEncontrado = false;
+                    foreach (var m in Medicos)
+                    {
+                        if (m.Especialidad.ToLower().Contains(criterioE.ToLower()))
+                        {
+                            m.MostrarInformacion();
+                            mEncontrado = true;
+                        }
+                    }
+                    if (!mEncontrado) Console.WriteLine("ℹ️ No se encontraron médicos en esa especialidad.");
+                    break;
+
+                case "3":
+                    Console.Write("🔹 Ingrese la Cédula del Paciente: ");
+                    string cedHistorial = Console.ReadLine() ?? string.Empty;
+                    Paciente pacHist = null;
+                    foreach (var p in Pacientes) if (p.Cedula == cedHistorial) pacHist = p;
+
+                    if (pacHist == null)
+                    {
+                        Console.WriteLine("🛑 Error: El paciente no existe.");
+                        return;
+                    }
+
+                    Console.WriteLine($"\n📜 HISTORIAL CLÍNICO DE: {pacHist.NombreCompleto}");
+                    if (pacHist.HistorialCitas.Count == 0) Console.WriteLine("   No registra consultas previas.");
+                    foreach (var cita in pacHist.HistorialCitas)
+                    {
+                        string est = cita.Atendida ? "✅ Atendida" : "⏳ Pendiente";
+                        Console.WriteLine($"   - Cita {cita.Codigo} | Dr. {cita.Medico.NombreCompleto} | Estado: {est}");
+                        if (cita.Atendida) Console.WriteLine($"     Diagnóstico: {cita.MotivoConsulta}");
+                    }
+                    break;
+
+                case "4":
+                    Console.Write("🔹 Ingrese el Código de la Cita o Nombre del Paciente: ");
+                    string criterioC = Console.ReadLine() ?? string.Empty;
+                    bool citEncontrada = false;
+                    foreach (var cita in Citas)
+                    {
+                        if (cita.Codigo.ToLower().Contains(criterioC.ToLower()) || cita.Paciente.NombreCompleto.ToLower().Contains(criterioC.ToLower()))
+                        {
+                            cita.MostrarInformacion();
+                            citEncontrada = true;
+                        }
+                    }
+                    if (!citEncontrada) Console.WriteLine("ℹ️ No se encontraron citas bajo ese criterio.");
+                    break;
+
+                default:
+                    Console.WriteLine("Volviendo al menú principal...");
+                    break;
+            }
+        }
     }
 
     // =================================================================
-    // INTEGRANTE 1: CLASES PACIENTE Y MÉDICO (Constructores y Métodos)
+    // INTEGRANTE 1: CLASES PACIENTE Y MÉDICO (Propiedades Automáticas Básicas)
     // =================================================================
     public class Paciente
     {
