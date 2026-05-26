@@ -10,7 +10,7 @@ namespace SistemaGestionMedica
     {
         static void Main(string[] args)
         {
-            // Seteamos la codificación universal para soportar emojis y caracteres especiales
+            // Codificación universal para soportar emojis y caracteres especiales
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
             // 1. Instancia la clínica en memoria con las listas globales vacías
@@ -24,15 +24,15 @@ namespace SistemaGestionMedica
                     Console.WriteLine("\n=======================================");
                     Console.WriteLine("    🏥  SISTEMA DE GESTIÓN MÉDICA  🏥   ");
                     Console.WriteLine("=======================================");
-                    Console.WriteLine(" 1. 👤 Registrar Paciente"); // Esto lo debe desarrollar el Integrante 3:  
-                    Console.WriteLine(" 2. 🥼 Registrar Médico");  // Esto lo debe desarrollar el Integrante 3: 
-                    Console.WriteLine(" 3. 📋 Mostrar Lista de Pacientes"); // Esto lo debe desarrollar el Integrante 3: 
-                    Console.WriteLine(" 4. 🗂️ Mostrar Todos los Médicos");  // Esto lo debe desarrollar el Integrante 3: 
-                    Console.WriteLine(" 5. ✅ Mostrar Médicos Disponibles"); // Esto lo debe desarrollar el Integrante 3: 
-                    Console.WriteLine(" 6. 📅 Agendar Cita"); //Int. 4. Listo 
-                    Console.WriteLine(" 7. 🩺 Atender Cita");  //Int. 4. Listo
-                    Console.WriteLine(" 8. ⏳ Mostrar Citas Pendientes"); //Int. 4. Listo
-                    Console.WriteLine(" 9. 📜 Mostrar Historial General"); //Int. 4. Listo
+                    Console.WriteLine(" 1. 👤 Registrar Paciente");  
+                    Console.WriteLine(" 2. 🥼 Registrar Médico");  
+                    Console.WriteLine(" 3. 📋 Mostrar Lista de Pacientes"); 
+                    Console.WriteLine(" 4. 🗂️ Mostrar Todos los Médicos");  
+                    Console.WriteLine(" 5. ✅ Mostrar Médicos Disponibles"); 
+                    Console.WriteLine(" 6. 📅 Agendar Cita"); 
+                    Console.WriteLine(" 7. 🩺 Atender Cita");  
+                    Console.WriteLine(" 8. ⏳ Mostrar Citas Pendientes");
+                    Console.WriteLine(" 9. 📜 Mostrar Historial General"); 
                     Console.WriteLine("10. ❌ Salir del Sistema");
                     Console.Write("\n🔹 Seleccione una opción (1-10): ");
 
@@ -159,7 +159,7 @@ namespace SistemaGestionMedica
                 return;
             }
 
-            // Instanciamos usando el constructor parametrizado del Integrante 1
+            // Se instancia usando el constructor parametrizado del Integrante 1
             Paciente nuevoPaciente = new Paciente(cedulaInput, nombreInput, edadConvertida, telefonoInput);
             Pacientes.Add(nuevoPaciente);
 
@@ -208,7 +208,7 @@ namespace SistemaGestionMedica
                 return;
             }
 
-            // Instanciamos usando el constructor parametrizado del Integrante 1
+            // Se instancia usando el constructor parametrizado del Integrante 1
             Medico nuevoMedico = new Medico(codigoInput, nombreInput, especialidadInput);
             Medicos.Add(nuevoMedico);
 
@@ -284,7 +284,7 @@ namespace SistemaGestionMedica
         }
 
         // =============================================================
-        // LÓGICA DE CITAS Y NEGOCIO ---> PARTE DEL INTEGRANTE 4 (TÚ)
+        // LÓGICA DE CITAS Y NEGOCIO ---> INTEGRANTE 4
         // =============================================================
         public void AgendarCita(string cedula, string codigoMedico)
         {
@@ -413,7 +413,7 @@ namespace SistemaGestionMedica
             HistorialCitas = new List<Cita>();
         }
 
-        // Constructor parametrizado (El que necesita el Integrante 3)
+        // Constructor parametrizado
         public Paciente(string cedula, string nombre, int edad, string telefono)
         {
             Cedula = cedula;
@@ -433,7 +433,7 @@ namespace SistemaGestionMedica
     {
         public string CodigoMedico { get; set; }
         public string NombreCompleto { get; set; }
-        public string Especialidad { get; set; } // <--- Cambiado a Español
+        public string Especialidad { get; set; }
         public bool Disponible { get; set; }
         public List<Paciente> PacientesAtendidos { get; set; }
 
@@ -445,12 +445,12 @@ namespace SistemaGestionMedica
             PacientesAtendidos = new List<Paciente>();
         }
 
-        // Constructor parametrizado (El que necesita el Integrante 3)
+        // Constructor parametrizado
         public Medico(string codigo, string nombre, string especialidad)
         {
             CodigoMedico = codigo;
             NombreCompleto = nombre;
-            Especialidad = especialidad; // <--- Asignación corregida en español
+            Especialidad = especialidad;
             Disponible = true;
             PacientesAtendidos = new List<Paciente>();
         }
@@ -530,7 +530,6 @@ namespace SistemaGestionMedica
             Console.WriteLine($"🔹 Cita Código: {Codigo} | Estado: {(Atendida ? "✅ Atendida" : "⏳ Pendiente")}");
             Console.WriteLine($"📅 Fecha: {FechaCita:dd/MM/yyyy HH:mm}");
             Console.WriteLine($"👤 Paciente: {Paciente.NombreCompleto} (Cédula: {Paciente.Cedula})");
-            // LÍNEA CORREGIDA: Ahora accede a Medico.Especialidad sin errores ⬇️
             Console.WriteLine($"🥼 Médico: {Medico.NombreCompleto} (Especialidad: {Medico.Especialidad})");
             Console.WriteLine($"📝 Motivo de Consulta: {(string.IsNullOrEmpty(MotivoConsulta) ? "No especificado" : MotivoConsulta)}");
             Console.WriteLine("---------------------------------------------------------");
