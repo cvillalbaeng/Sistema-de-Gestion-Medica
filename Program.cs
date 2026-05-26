@@ -304,7 +304,7 @@ namespace SistemaGestionMedica
         }
 
         // =============================================================
-        // LÓGICA DE CITAS Y NEGOCIO ---> INTEGRANTE 4 (TÚ)
+        // LÓGICA DE CITAS Y NEGOCIO ---> INTEGRANTE 4
         // =============================================================
         public void AgendarCita(string cedula, string codigoMedico)
         {
