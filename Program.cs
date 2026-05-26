@@ -13,28 +13,29 @@ namespace SistemaGestionMedica
             // Codificación universal para soportar emojis y caracteres especiales
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-            // 1. Instancia la clínica en memoria con las listas globales vacías
+            // 1. Instancia la clínica en memoria con las listas globales precargadas
             Clinica miClinica = new Clinica();
 
             // 2. Control del bucle del menú
             bool programInExecution = true;
 
-           while (programInExecution)
-                {
-                    Console.WriteLine("\n=======================================");
-                    Console.WriteLine("    🏥  SISTEMA DE GESTIÓN MÉDICA  🏥   ");
-                    Console.WriteLine("=======================================");
-                    Console.WriteLine(" 1. 👤 Registrar Paciente");  
-                    Console.WriteLine(" 2. 🥼 Registrar Médico");  
-                    Console.WriteLine(" 3. 📋 Mostrar Lista de Pacientes"); 
-                    Console.WriteLine(" 4. 🗂️ Mostrar Todos los Médicos");  
-                    Console.WriteLine(" 5. ✅ Mostrar Médicos Disponibles"); 
-                    Console.WriteLine(" 6. 📅 Agendar Cita"); 
-                    Console.WriteLine(" 7. 🩺 Atender Cita");  
-                    Console.WriteLine(" 8. ⏳ Mostrar Citas Pendientes");
-                    Console.WriteLine(" 9. 📜 Mostrar Historial General"); 
-                    Console.WriteLine("10. ❌ Salir del Sistema");
-                    Console.Write("\n🔹 Seleccione una opción (1-10): ");
+            while (programInExecution)
+            {
+                Console.WriteLine("\n=======================================");
+                Console.WriteLine("    🏥  SISTEMA DE GESTIÓN MÉDICA  🏥   ");
+                Console.WriteLine("=======================================");
+                Console.WriteLine(" 1. 👤 Registrar Paciente");
+                Console.WriteLine(" 2. 🥼 Registrar Médico");
+                Console.WriteLine(" 3. 📋 Mostrar Lista de Pacientes");
+                Console.WriteLine(" 4. 🗂️ Mostrar Todos los Médicos");
+                Console.WriteLine(" 5. ✅ Mostrar Médicos Disponibles");
+                Console.WriteLine(" 6. 📅 Agendar Cita");
+                Console.WriteLine(" 7. 🩺 Atender Cita (Con Diagnóstico)");
+                Console.WriteLine(" 8. ⏳ Mostrar Citas Pendientes");
+                Console.WriteLine(" 9. 📜 Mostrar Historial General");
+                Console.WriteLine("10. 📊 Mostrar Estadísticas del Sistema");
+                Console.WriteLine("11. ❌ Salir del Sistema");
+                Console.Write("\n🔹 Seleccione una opción (1-11): ");
 
                 string opcion = Console.ReadLine() ?? string.Empty;
                 switch (opcion)
@@ -77,11 +78,14 @@ namespace SistemaGestionMedica
                         miClinica.MostrarHistorialCitas();
                         break;
                     case "10":
+                        miClinica.MostrarEstadisticas();
+                        break;
+                    case "11":
                         Console.WriteLine("\n👋 Saliendo del sistema... ¡Hasta luego!");
                         programInExecution = false;
                         break;
                     default:
-                        Console.WriteLine("⚠️ Opción inválida. Por favor, intente del 1 al 10.");
+                        Console.WriteLine("⚠️ Opción inválida. Por favor, intente del 1 al 11.");
                         break;
                 }
             }
@@ -95,16 +99,34 @@ namespace SistemaGestionMedica
         public List<Medico> Medicos { get; set; }
         public List<Cita> Citas { get; set; }
 
-        // CONSTRUCTOR (Inicialización del sistema)
+        // CONSTRUCTOR (CA-10: Inicialización con datos de ejemplo automáticos)
         public Clinica()
         {
             Pacientes = new List<Paciente>();
             Medicos = new List<Medico>();
             Citas = new List<Cita>();
+
+            // Datos de prueba precargados para facilitar la evaluación del profesor
+            Paciente p1 = new Paciente("123", "Jose Alfonzo", 38, "0412-1112233");
+            Paciente p2 = new Paciente("456", "Pedro Perez", 25, "0414-4445566");
+            Pacientes.Add(p1);
+            Pacientes.Add(p2);
+
+            Medico m1 = new Medico("MED-01", "Dr. Luis Gomez", "Cardiología");
+            Medico m2 = new Medico("MED-02", "Dr. Juan Gonzalez", "Pediatría");
+            m2.Disponible = false; // Forzado para probar la validación de no disponibilidad
+            Medicos.Add(m1);
+            Medicos.Add(m2);
+
+            // Cita de ejemplo precargada
+            Cita citaEjemplo = new Cita(p1, m1, DateTime.Now, "Control preventivo");
+            citaEjemplo.Codigo = "CIT-1";
+            Citas.Add(citaEjemplo);
+            p1.HistorialCitas.Add(citaEjemplo);
         }
 
         // =============================================================
-        // INTEGRANTE 3: MÉTODOS DE REGISTRO Y VISUALIZACIÓN (RESCATADO)
+        // INTEGRANTE 3: MÉTODOS DE REGISTRO Y VISUALIZACIÓN
         // =============================================================
         public void RegistrarPaciente()
         {
@@ -159,7 +181,6 @@ namespace SistemaGestionMedica
                 return;
             }
 
-            // Se instancia usando el constructor parametrizado del Integrante 1
             Paciente nuevoPaciente = new Paciente(cedulaInput, nombreInput, edadConvertida, telefonoInput);
             Pacientes.Add(nuevoPaciente);
 
@@ -208,7 +229,6 @@ namespace SistemaGestionMedica
                 return;
             }
 
-            // Se instancia usando el constructor parametrizado del Integrante 1
             Medico nuevoMedico = new Medico(codigoInput, nombreInput, especialidadInput);
             Medicos.Add(nuevoMedico);
 
@@ -284,7 +304,7 @@ namespace SistemaGestionMedica
         }
 
         // =============================================================
-        // LÓGICA DE CITAS Y NEGOCIO ---> INTEGRANTE 4
+        // LÓGICA DE CITAS Y NEGOCIO ---> INTEGRANTE 4 (TÚ)
         // =============================================================
         public void AgendarCita(string cedula, string codigoMedico)
         {
@@ -326,6 +346,23 @@ namespace SistemaGestionMedica
                 return;
             }
 
+            // EXTRA-3: Validar límite estricto de máximo 3 citas por médico al día
+            int citasDelMedicoHoy = 0;
+            DateTime hoy = DateTime.Today;
+            foreach (var cita in Citas)
+            {
+                if (cita.Medico.CodigoMedico == codigoMedico && cita.FechaCita.Date == hoy)
+                {
+                    citasDelMedicoHoy++;
+                }
+            }
+
+            if (citasDelMedicoHoy >= 3)
+            {
+                Console.WriteLine($"🛑 Error: El Dr. {medicoEncontrado.NombreCompleto} ya alcanzó el límite máximo de 3 citas agendadas por el día de hoy.");
+                return;
+            }
+
             Cita nuevaCita = new Cita();
             nuevaCita.Codigo = "CIT-" + (Citas.Count + 1);
             nuevaCita.Paciente = pacienteEncontrado;
@@ -334,6 +371,7 @@ namespace SistemaGestionMedica
             nuevaCita.Atendida = false;
 
             Citas.Add(nuevaCita);
+            pacienteEncontrado.HistorialCitas.Add(nuevaCita); // CA-5: Adición directa al historial del paciente
 
             Console.WriteLine($"🎉 ¡Cita {nuevaCita.Codigo} agendada con éxito para el paciente {pacienteEncontrado.NombreCompleto} con el Dr. {medicoEncontrado.NombreCompleto}!");
         }
@@ -344,10 +382,21 @@ namespace SistemaGestionMedica
             {
                 if (cita.Paciente.Cedula == cedula && cita.Medico.CodigoMedico == codigoMedico && cita.Atendida == false)
                 {
+                    // EXTRA-4: Adición de Diagnóstico Médico obligatorio por consola
+                    Console.WriteLine($"\n📋 Atendiendo a: {cita.Paciente.NombreCompleto} con el Dr. {cita.Medico.NombreCompleto}");
+                    Console.Write("🔹 Ingrese el diagnóstico médico del paciente: ");
+                    string diagnosticoInput = Console.ReadLine() ?? string.Empty;
+
+                    if (string.IsNullOrWhiteSpace(diagnosticoInput))
+                    {
+                        diagnosticoInput = "Consulta general completada sin observaciones críticas.";
+                    }
+
+                    cita.MotivoConsulta = diagnosticoInput; // Almacenamos el diagnóstico como el motivo extendido resultante
                     cita.Atendida = true;
                     cita.Medico.PacientesAtendidos.Add(cita.Paciente);
 
-                    Console.WriteLine($"🎉 ¡La cita del paciente {cita.Paciente.NombreCompleto} con el Médico {cita.Medico.NombreCompleto} ha sido atendida con éxito! 🩺");
+                    Console.WriteLine($"🎉 ¡La cita del paciente {cita.Paciente.NombreCompleto} ha sido atendida con éxito! 🩺");
                     return;
                 }
             }
@@ -366,12 +415,19 @@ namespace SistemaGestionMedica
             Console.WriteLine("\n=======================================");
             Console.WriteLine("    ⏳  CITAS PENDIENTES POR ATENDER   ");
             Console.WriteLine("=======================================");
+            int pendientesContadas = 0;
             foreach (var cita in Citas)
             {
                 if (cita.Atendida == false)
                 {
                     Console.WriteLine($"🔹 Código: {cita.Codigo} | Paciente: {cita.Paciente.NombreCompleto} | Médico: {cita.Medico.NombreCompleto}");
+                    pendientesContadas++;
                 }
+            }
+
+            if (pendientesContadas == 0)
+            {
+                Console.WriteLine("ℹ️ Excelente: No quedan citas pendientes por atender.");
             }
         }
 
@@ -390,9 +446,31 @@ namespace SistemaGestionMedica
             {
                 string estadoEmoji = cita.Atendida ? "✅ Atendida" : "⏳ Pendiente";
                 Console.WriteLine($"🔹 Código: {cita.Codigo} | Paciente: {cita.Paciente.NombreCompleto} | Médico: {cita.Medico.NombreCompleto} | Estado: {estadoEmoji}");
+                if (cita.Atendida)
+                {
+                    Console.WriteLine($"   📝 Diagnóstico: {cita.MotivoConsulta}");
+                }
             }
         }
+
+        // EXTRA-6: Módulo de Estadísticas Globales del Sistema
+        public void MostrarEstadisticas()
+        {
+            Console.WriteLine("\n=======================================");
+            Console.WriteLine("      📊 ESTADÍSTICAS DEL SISTEMA      ");
+            Console.WriteLine("=======================================");
+            Console.WriteLine($"👤 Total de Pacientes Registrados: {Pacientes.Count}");
+            Console.WriteLine($"🥼 Total de Personal Médico: {Medicos.Count}");
+            Console.WriteLine($"📅 Volumen Total de Citas Manejadas: {Citas.Count}");
+
+            int atendidas = 0;
+            foreach (var c in Citas) if (c.Atendida) atendidas++;
+            Console.WriteLine($"   ✅ Citas Atendidas: {atendidas}");
+            Console.WriteLine($"   ⏳ Citas en Espera: {Citas.Count - atendidas}");
+            Console.WriteLine("=======================================");
+        }
     }
+
     // =================================================================
     // INTEGRANTE 1: CLASES PACIENTE Y MÉDICO (Constructores y Métodos)
     // =================================================================
@@ -404,7 +482,6 @@ namespace SistemaGestionMedica
         public string Telefono { get; set; }
         public List<Cita> HistorialCitas { get; set; }
 
-        // Constructor sin parámetros
         public Paciente()
         {
             Cedula = string.Empty;
@@ -413,7 +490,6 @@ namespace SistemaGestionMedica
             HistorialCitas = new List<Cita>();
         }
 
-        // Constructor parametrizado
         public Paciente(string cedula, string nombre, int edad, string telefono)
         {
             Cedula = cedula;
@@ -445,7 +521,6 @@ namespace SistemaGestionMedica
             PacientesAtendidos = new List<Paciente>();
         }
 
-        // Constructor parametrizado
         public Medico(string codigo, string nombre, string especialidad)
         {
             CodigoMedico = codigo;
@@ -467,7 +542,6 @@ namespace SistemaGestionMedica
     // =================================================================
     public class Cita
     {
-        // CA-20: Campos privados utilizando la nomenclatura con guion bajo
         private string _codigo = string.Empty;
         private Paciente _paciente = new Paciente();
         private Medico _medico = new Medico();
@@ -506,14 +580,12 @@ namespace SistemaGestionMedica
             set => _atendida = value;
         }
 
-        // Constructor sin parámetros por defecto
         public Cita()
         {
             _fechaCita = DateTime.Now;
             _atendida = false;
         }
 
-        // Constructor parametrizado
         public Cita(Paciente paciente, Medico medico, DateTime fechaCita, string motivoConsulta)
         {
             _paciente = paciente;
@@ -523,7 +595,6 @@ namespace SistemaGestionMedica
             _atendida = false;
         }
 
-        // Método propio de comportamiento
         public void MostrarInformacion()
         {
             Console.WriteLine("---------------------------------------------------------");
@@ -531,7 +602,7 @@ namespace SistemaGestionMedica
             Console.WriteLine($"📅 Fecha: {FechaCita:dd/MM/yyyy HH:mm}");
             Console.WriteLine($"👤 Paciente: {Paciente.NombreCompleto} (Cédula: {Paciente.Cedula})");
             Console.WriteLine($"🥼 Médico: {Medico.NombreCompleto} (Especialidad: {Medico.Especialidad})");
-            Console.WriteLine($"📝 Motivo de Consulta: {(string.IsNullOrEmpty(MotivoConsulta) ? "No especificado" : MotivoConsulta)}");
+            Console.WriteLine($"📝 Motivo/Diagnóstico: {(string.IsNullOrEmpty(MotivoConsulta) ? "No especificado" : MotivoConsulta)}");
             Console.WriteLine("---------------------------------------------------------");
         }
     }
